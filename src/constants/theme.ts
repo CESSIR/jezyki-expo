@@ -1,9 +1,7 @@
 /**
- * @fileoverview Design system tokens for WeatherNow.
+ * @fileoverview Tokeny systemu designu dla WeatherNow.
  *
- * WHY centralized tokens? A single source of truth for colors, fonts, and spacing
- * prevents style drift across components and makes theme switching trivial.
- * This follows the "Design Tokens" pattern recommended for scalable apps.
+ * Centralne miejsce dla kolorów i styli. Ułatwia zmianę motywu.
  */
 
 import { Platform } from 'react-native';

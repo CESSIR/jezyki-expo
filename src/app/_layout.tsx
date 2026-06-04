@@ -1,21 +1,19 @@
 /**
- * @fileoverview Root layout for WeatherNow application.
+ * @fileoverview Główny layout aplikacji WeatherNow.
  *
- * WHY ThemeProvider? Ensures consistent dark/light theme propagation through
- * the entire navigation tree, following Expo Router best practices.
- *
- * WHY SplashScreen.preventAutoHideAsync()? Prevents flash of unstyled content
- * on app launch. The splash screen stays visible until we explicitly hide it
- * after critical resources (fonts, cached data) are loaded.
+ * Używamy Expo Router (routing oparty na plikach), bo zapewnia 
+ * czytelną architekturę. ThemeProvider gwarantuje spójny motyw.
+ * SplashScreen.preventAutoHideAsync() zapobiega miganiu przed załadowaniem zasobów.
  */
+import '../global.css'; // Wymagane przez NativeWind v4
+
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 
-/** Keep splash screen visible while we load resources */
+/** Zatrzymanie ukrywania ekranu powitalnego */
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -23,9 +21,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     /**
-     * WHY setTimeout? In a real app, we'd await font loading, cached data, etc.
-     * For now, we hide the splash screen immediately after the first render.
-     * This will be replaced with actual resource loading logic in future tasks.
+     * Symulacja ładowania zasobów (zostanie zastąpiona docelową logiką).
      */
     SplashScreen.hideAsync();
   }, []);
@@ -33,9 +29,24 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
-        <Stack.Screen name="index" options={{ title: 'WeatherNow' }} />
+        {/*
+         * Nawigacja główna ukryta w podfolderze (tabs).
+         * Dzięki wpisowi 'headerShown: false' główny Stack nie będzie dublował nagłówka z zakładkami.
+         */}
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
+        {/*
+         * Ekran prognozy 7-dniowej. Jest to ekran typu Stack, który może zostać otwarty
+         * ponad zakładkami (jako podstrona).
+         */}
+        <Stack.Screen
+          name="forecast"
+          options={{
+            title: 'Prognoza 7-dniowa',
+            presentation: 'card',
+          }}
+        />
       </Stack>
-      <StatusBar style="auto" />
     </ThemeProvider>
   );
 }
