@@ -1,7 +1,7 @@
 /**
  * @fileoverview Główny layout aplikacji WeatherNow.
  *
- * Używamy Expo Router (routing oparty na plikach), bo zapewnia 
+ * Używamy Expo Router (routing oparty na plikach), bo zapewnia
  * czytelną architekturę. ThemeProvider gwarantuje spójny motyw.
  * SplashScreen.preventAutoHideAsync() zapobiega miganiu przed załadowaniem zasobów.
  */
