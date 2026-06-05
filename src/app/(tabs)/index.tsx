@@ -5,18 +5,28 @@
  * Wynik zapisujemy do sklepu Zustand.
  */
 import * as Location from 'expo-location';
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
 import { useWeatherStore } from '@/store/weatherStore';
 
 export default function HomeScreen() {
-  const { latitude, longitude, status, errorMessage, setStatus, setLocation } = useWeatherStore();
+  const {
+    latitude,
+    longitude,
+    status,
+    errorMessage,
+    currentWeather,
+    setStatus,
+    setLocation,
+    fetchWeatherData,
+  } = useWeatherStore();
+  const router = useRouter();
 
   useEffect(() => {
-    /** Pobiera lokalizację przy starcie i zapisuje wynik do sklepu. */
-    const fetchLocation = async () => {
+    /** Pobiera lokalizację przy starcie i uruchamia zapytanie do API. */
+    const initWeather = async () => {
       setStatus('loading');
       const { status: permissionStatus } = await Location.requestForegroundPermissionsAsync();
 
@@ -27,14 +37,31 @@ export default function HomeScreen() {
 
       try {
         const location = await Location.getCurrentPositionAsync({});
-        setLocation(location.coords.latitude, location.coords.longitude);
-      } catch (_error) {
+        const lat = location.coords.latitude;
+        const lon = location.coords.longitude;
+        setLocation(lat, lon);
+
+        // Pomyślny GPS - uruchamiamy pobieranie z Open-Meteo
+        await fetchWeatherData(lat, lon);
+      } catch {
         setStatus('error', 'Nie udało się pobrać lokalizacji GPS');
       }
     };
 
-    fetchLocation();
-  }, [setLocation, setStatus]);
+    initWeather();
+  }, [setLocation, setStatus, fetchWeatherData]);
+
+  /**
+   * Przejście do prognozy używając router.push (wymóg programatycznej nawigacji z parametrami).
+   */
+  const handleGoToForecast = () => {
+    if (latitude && longitude) {
+      router.push({
+        pathname: '/forecast',
+        params: { lat: latitude.toString(), lon: longitude.toString(), cityName: 'GPS' },
+      });
+    }
+  };
 
   return (
     <View className="flex-1 items-center justify-center bg-weather-surface p-4">
@@ -43,7 +70,7 @@ export default function HomeScreen() {
       {status === 'loading' && (
         <View className="items-center mb-6">
           <ActivityIndicator size="large" color="#208AEF" />
-          <Text className="text-weather-secondary mt-2">Pobieranie lokalizacji...</Text>
+          <Text className="text-weather-secondary mt-2">Pobieranie danych...</Text>
         </View>
       )}
 
@@ -53,41 +80,28 @@ export default function HomeScreen() {
         </View>
       )}
 
-      {status === 'success' && (
-        <View className="bg-white p-4 rounded-xl shadow-sm mb-6 w-full max-w-sm">
-          <Text className="text-lg text-center mb-1 font-semibold text-weather-text">
-            Pomyślnie pobrano pozycję GPS
+      {status === 'success' && currentWeather && (
+        <View className="bg-white p-8 rounded-3xl shadow-sm mb-6 w-full max-w-sm items-center">
+          <Text className="text-6xl font-bold text-weather-text">
+            {Math.round(currentWeather.temp)}°C
           </Text>
-          <Text className="text-sm text-weather-secondary text-center">
-            {latitude?.toFixed(4)}, {longitude?.toFixed(4)}
-          </Text>
+          <Text className="text-lg text-weather-secondary mt-2">Zaktualizowano pomyślnie</Text>
         </View>
       )}
 
       {/* 
         Przycisk otwierający prognozę 7-dniową.
-        Przekazuje parametry GPS ze sklepu (spełnia kryterium parametrów nawigacji).
+        Wykorzystuje router.push zamiast komponentu Link dla odmiany.
       */}
-      <Link
-        href={{
-          pathname: '/forecast',
-          params: {
-            lat: latitude?.toString() ?? '',
-            lon: longitude?.toString() ?? '',
-            cityName: 'GPS',
-          },
-        }}
-        asChild
+      <Pressable
+        onPress={handleGoToForecast}
+        className={`bg-weather-primary px-6 py-3 rounded-full active:opacity-80 mt-4 ${
+          status !== 'success' ? 'opacity-50' : ''
+        }`}
+        disabled={status !== 'success'}
       >
-        <Pressable
-          className={`bg-weather-primary px-6 py-3 rounded-full active:opacity-80 ${
-            status !== 'success' ? 'opacity-50' : ''
-          }`}
-          disabled={status !== 'success'}
-        >
-          <Text className="text-white font-semibold text-base">Zobacz prognozę 7-dniową</Text>
-        </Pressable>
-      </Link>
+        <Text className="text-white font-semibold text-base">Zobacz prognozę 7-dniową</Text>
+      </Pressable>
     </View>
   );
 }

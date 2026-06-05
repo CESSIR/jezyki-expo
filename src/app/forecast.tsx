@@ -2,37 +2,57 @@
  * @fileoverview Ekran prognozy 7-dniowej.
  *
  * Odbiera parametry z ekranu głównego (spełnia kryterium oceny).
+ * Wykorzystuje dane pobrane ze sklepu Zustand.
  */
 import { useLocalSearchParams } from 'expo-router';
-import { Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
+
+import { useWeatherStore } from '@/store/weatherStore';
 
 export default function ForecastScreen() {
-  // Pobranie parametrów z URL / nawigacji
-  const { lat, lon, cityName } = useLocalSearchParams<{
+  const { cityName } = useLocalSearchParams<{
     lat: string;
     lon: string;
     cityName: string;
   }>();
 
-  return (
-    <View className="flex-1 items-center justify-center bg-weather-surface p-4">
-      <Text className="text-3xl font-bold text-weather-primary-dark mb-2">
-        📅 Prognoza 7-dniowa
-      </Text>
+  const { forecastData } = useWeatherStore();
 
-      {/* Wyświetlanie przekazanych parametrów nawigacji */}
-      <View className="bg-white p-4 rounded-xl shadow-sm mb-6 w-full max-w-sm">
-        <Text className="text-lg font-semibold text-center mb-2">
-          Wybrane miasto: <Text className="text-weather-primary">{cityName ?? 'Nieznane'}</Text>
+  return (
+    <ScrollView className="flex-1 bg-weather-surface p-4">
+      <View className="items-center mb-6 mt-4">
+        <Text className="text-3xl font-bold text-weather-primary-dark mb-2">
+          📅 Prognoza 7-dniowa
         </Text>
-        <Text className="text-sm text-weather-secondary text-center">
-          Współrzędne: {lat}, {lon}
+        <Text className="text-lg font-semibold">
+          Wybrane miasto: <Text className="text-weather-primary">{cityName ?? 'GPS'}</Text>
         </Text>
       </View>
 
-      <Text className="text-base text-weather-secondary text-center">
-        Docelowo tutaj pojawi się lista 7-dniowej prognozy pobrana z API Open-Meteo.
-      </Text>
-    </View>
+      {forecastData ? (
+        <View className="space-y-3">
+          {forecastData.time.map((dateStr, index) => (
+            <View
+              key={dateStr}
+              className="bg-white p-4 rounded-xl shadow-sm flex-row justify-between items-center mb-2"
+            >
+              <Text className="text-base font-medium">{dateStr}</Text>
+              <View className="flex-row items-center gap-4">
+                <Text className="text-weather-secondary">
+                  Min: {Math.round(forecastData.temperature_2m_min[index])}°C
+                </Text>
+                <Text className="text-weather-primary font-bold">
+                  Max: {Math.round(forecastData.temperature_2m_max[index])}°C
+                </Text>
+              </View>
+            </View>
+          ))}
+        </View>
+      ) : (
+        <Text className="text-base text-weather-secondary text-center">
+          Brak danych prognozy. Wróć do ekranu głównego.
+        </Text>
+      )}
+    </ScrollView>
   );
 }
