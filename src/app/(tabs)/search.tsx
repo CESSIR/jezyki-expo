@@ -8,6 +8,8 @@ import { useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, Text, TextInput, View } from 'react-native';
 
+import { useWeatherStore } from '@/store/weatherStore';
+
 export interface GeocodingResult {
   id: number;
   name: string;
@@ -19,6 +21,7 @@ export interface GeocodingResult {
 
 export default function SearchScreen() {
   const router = useRouter();
+  const { favorites, addFavorite, removeFavorite } = useWeatherStore();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<GeocodingResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -62,24 +65,46 @@ export default function SearchScreen() {
     [router],
   );
 
+  /** Callback kliknięcia w gwiazdkę - dodaje lub usuwa z ulubionych (Kryterium 14). */
+  const toggleFavorite = useCallback(
+    (city: GeocodingResult) => {
+      const isFav = favorites.some((f) => f.id === city.id.toString());
+      if (isFav) {
+        removeFavorite(city.id.toString());
+      } else {
+        addFavorite({
+          id: city.id.toString(),
+          name: city.name,
+          lat: city.latitude,
+          lon: city.longitude,
+        });
+      }
+    },
+    [favorites, addFavorite, removeFavorite],
+  );
+
   /** Zewnętrzna metoda renderItem zapewnia brak alokacji w każdym cyklu, podnosząc wydajność. */
   const renderItem = useCallback(
-    ({ item }: { item: GeocodingResult }) => (
-      <Pressable
-        onPress={() => handleCityPress(item)}
-        className="bg-white p-4 rounded-xl shadow-sm mb-3 flex-row justify-between items-center active:opacity-80"
-      >
-        <View>
-          <Text className="text-lg font-bold text-weather-text">{item.name}</Text>
-          <Text className="text-sm text-weather-secondary">
-            {item.admin1 ? `${item.admin1}, ` : ''}
-            {item.country}
-          </Text>
+    ({ item }: { item: GeocodingResult }) => {
+      const isFav = favorites.some((f) => f.id === item.id.toString());
+      return (
+        <View className="bg-white p-4 rounded-xl shadow-sm mb-3 flex-row justify-between items-center">
+          <Pressable onPress={() => handleCityPress(item)} className="flex-1 active:opacity-80">
+            <Text className="text-lg font-bold text-weather-text">{item.name}</Text>
+            <Text className="text-sm text-weather-secondary">
+              {item.admin1 ? `${item.admin1}, ` : ''}
+              {item.country}
+            </Text>
+          </Pressable>
+          <Pressable onPress={() => toggleFavorite(item)} className="p-2 ml-2">
+            <Text className="text-2xl" style={{ color: isFav ? '#FFD700' : '#CCC' }}>
+              {isFav ? '★' : '☆'}
+            </Text>
+          </Pressable>
         </View>
-        <Text className="text-weather-primary font-semibold text-2xl">›</Text>
-      </Pressable>
-    ),
-    [handleCityPress],
+      );
+    },
+    [handleCityPress, favorites, toggleFavorite],
   );
 
   return (

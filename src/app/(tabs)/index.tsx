@@ -6,7 +6,7 @@
  */
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
 import { useWeatherStore } from '@/store/weatherStore';
@@ -28,6 +28,7 @@ export default function HomeScreen() {
     removeFavorite,
   } = useWeatherStore();
   const router = useRouter();
+  const [cityName, setCityName] = useState<string>('Moja lokalizacja');
 
   useEffect(() => {
     /** Inicjalizuje asynchroniczne dane sklepowe i lokalizację na starcie. */
@@ -46,6 +47,12 @@ export default function HomeScreen() {
         const lat = location.coords.latitude;
         const lon = location.coords.longitude;
         setLocation(lat, lon);
+
+        // Reverse Geocoding w celu pobrania nazwy miasta dla bieżącego GPS
+        const geocode = await Location.reverseGeocodeAsync({ latitude: lat, longitude: lon });
+        const city =
+          geocode[0]?.city ?? geocode[0]?.subregion ?? geocode[0]?.region ?? 'Moja lokalizacja';
+        setCityName(city);
 
         await fetchWeatherData(lat, lon);
       } catch {
@@ -71,13 +78,15 @@ export default function HomeScreen() {
     if (isCurrentFavorite) {
       removeFavorite('gps-current');
     } else if (latitude && longitude) {
-      addFavorite({ id: 'gps-current', name: 'Moja lokalizacja', lat: latitude, lon: longitude });
+      addFavorite({ id: 'gps-current', name: cityName, lat: latitude, lon: longitude });
     }
   };
 
   return (
     <View className="flex-1 items-center justify-center bg-weather-surface p-4">
-      <Text className="text-3xl font-bold text-weather-primary-dark mb-4">📍 Twoja Pogoda</Text>
+      <Text className="text-3xl font-bold text-weather-primary-dark mb-4 text-center">
+        📍 {cityName}
+      </Text>
 
       {isOffline && (
         <View className="bg-yellow-100 p-3 rounded-lg mb-4 w-full max-w-sm border border-yellow-300">
