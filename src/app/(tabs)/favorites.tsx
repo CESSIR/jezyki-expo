@@ -4,11 +4,13 @@
  * Pobiera i wyświetla listę z Zustand.
  * Stan jest persystentny (AsyncStorage), co spełnia wymóg przechowywania lokalnego.
  */
+import { useRouter } from 'expo-router';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { useWeatherStore } from '@/store/weatherStore';
 
 export default function FavoritesScreen() {
+  const router = useRouter();
   const { favorites, removeFavorite } = useWeatherStore();
 
   return (
@@ -24,11 +26,21 @@ export default function FavoritesScreen() {
       ) : (
         <View className="space-y-3">
           {favorites.map((fav) => (
-            <View
+            <Pressable
               key={fav.id}
-              className="bg-white p-4 rounded-xl shadow-sm flex-row justify-between items-center mb-3"
+              onPress={() =>
+                router.push({
+                  pathname: '/forecast',
+                  params: {
+                    lat: fav.lat.toString(),
+                    lon: fav.lon.toString(),
+                    cityName: fav.name,
+                  },
+                })
+              }
+              className="bg-white p-4 rounded-xl shadow-sm flex-row justify-between items-center mb-3 active:opacity-80"
             >
-              <View>
+              <View className="flex-1">
                 <Text className="text-lg font-semibold text-weather-text">{fav.name}</Text>
                 <Text className="text-sm text-weather-secondary">
                   GPS: {fav.lat.toFixed(2)}, {fav.lon.toFixed(2)}
@@ -36,11 +48,11 @@ export default function FavoritesScreen() {
               </View>
               <Pressable
                 onPress={() => removeFavorite(fav.id)}
-                className="bg-red-100 px-3 py-2 rounded-lg"
+                className="bg-red-100 px-3 py-2 rounded-lg ml-2"
               >
                 <Text className="text-red-600 font-medium text-sm">Usuń</Text>
               </Pressable>
-            </View>
+            </Pressable>
           ))}
         </View>
       )}
