@@ -1,0 +1,7 @@
+/**
+ * Główny plik CSS dla NativeWind / Tailwind.
+ * Importuje podstawowe dyrektywy Tailwind (base, components, utilities).
+ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
