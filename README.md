@@ -1,56 +1,80 @@
-# Welcome to your Expo app 👋
+# WeatherNow
+## Aplikacja Pogodowa
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplikacja mobilna stworzona w środowisku **React Native (Expo SDK 54)** przy użyciu języka **TypeScript** oraz stylizowana za pomocą **NativeWind (Tailwind CSS)**.
 
-## Get started
+| Ekran Główny (GPS) | Wyszukiwarka miast | Prognoza 7-dniowa | Ulubione |
+| :---: | :---: | :---: | :---: |
+| ![Główny](./assets/images/index.jpg) | ![Szukaj](./assets/images/search.jpg) | ![Prognoza](./assets/images/forecast.jpg) | ![Ulubione](./assets/images/favorites.jpg) |
 
-1. Install dependencies
+---
 
-   ```bash
+## Jak uruchomić aplikację
+
+1. **Sklonuj repozytorium i wejdź do folderu:**
+   Otwórz wiersz poleceń (CMD), przejdź do folderu, w którym chcesz zainstalować program, a następnie wykonaj komendy:
+
+```bash
+   git clone <LINK_DO_TWOJEGO_REPOZYTORIUM>
+   cd jezyki-expo
+   ```
+
+2. **Zainstaluj wszystkie wymagane zależności:**
+Skorzystaj z polecenia:
+
+```bash
    npm install
    ```
 
-2. Start the app
+3. **Uruchom serwer Metro:**
+Skorzystaj z polecenia:
 
-   ```bash
+```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+Po uruchomieniu serwera wyskoczy kod QR. Zeskanuj go na swoim telefonie przez aplikację **Expo Go**. Zarówno telefon, jak i komputer muszą być w tej samej sieci Wi-Fi.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+**Rozwiązywanie problemów:** Jeżeli aplikacja nie ładuje się na telefonie, spróbuj wejść we właściwości sieci na swoim komputerze i przestaw **Profil sieciowy** z *Publiczny* na *Prywatny*.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## Użyte technologie
 
-When you're ready, run:
+* **Środowisko bazowe:** React Native + Expo (SDK 54) — uniwersalny framework do budowania natywnych aplikacji na Androida i iOS z jednego kodu źródłowego.
+* **Język programowania:** TypeScript — silne typowanie danych gwarantujące stabilność i eliminację błędów w czasie kompilacji.
+* **Zarządzanie stanem globalnym:** Zustand — lekki i wydajny menedżer stanu oparty na hookach, wybrany w celu optymalizacji re-renderów i uniknięcia nadmiaru kodu konfiguracyjnego.
+* **Nawigacja:** Expo Router — nowoczesny, plikowy system routingu automatyzujący zarządzanie ekranami i ułatwiający przekazywanie parametrów.
+* **Stylizowanie:** NativeWind (Tailwind CSS) — system klas narzędziowych zapewniający błyskawiczne i ujednolicone stylowanie komponentów.
+* **Warstwa offline & Cache:** NetInfo — asynchroniczne monitorowanie stanu sieci na żywo.
+* **Baza danych:** AsyncStorage — lokalna, trwała pamięć typu klucz-wartość do przechowywania ulubionych miast oraz pamięci podręcznej dla trybu offline.
+* **Transpiler:** Babel — zapewnia wsteczną kompatybilność kodu oraz kompilację stylów NativeWind.
+* **Środowisko testowe:** Jest — framework do automatycznych testów jednostkowych (aplikacja posiada 8 testów pokrywających logikę biznesową sklepu).
 
-```bash
-npm run reset-project
-```
+---
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Zależności Główne (Production Dependencies)
 
-### Other setup steps
+* **`expo`** (SDK 54) — Rdzeń platformy uruchomieniowej.
+* **`expo-router`** — Odpowiada za plikową nawigację między ekranami aplikacji.
+* **`expo-location`** — Odpowiada za natywny dostęp do modułu GPS w telefonie.
+* **`zustand`** — Centralny magazyn stanu aplikacji (zarządzanie pamięcią podręczną i ulubionymi).
+* **`nativewind`** — Silnik mapujący klasy Tailwind CSS na natywne style platform mobilnych.
+* **`@react-native-async-storage/async-storage`** — Lokalna baza danych klucz-wartość na dysku urządzenia.
+* **`@react-native-community/netinfo`** — Moduł monitorujący stan połączenia sieciowego.
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+### Zależności Deweloperskie (Development Dependencies)
 
-## Learn more
+* **`typescript`** — Kompilator i strażnik statycznego typowania kodu.
+* **`tailwindcss`** — Narzędzie dostarczające klasy stylów dla NativeWind w czasie dewelopmentu.
+* **`jest`** i **`jest-expo`** — Środowisko uruchomieniowe do automatycznego wykonywania testów jednostkowych sklepu pogodowego.
+* **`@babel/core`** — Transpiler kodu odpowiedzialny za kompatybilność wsteczną.
 
-To learn more about developing your project with Expo, look at the following resources:
+---
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Funkcjonalność
 
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+* Sprawdzenie pogody miejsca, w którym się aktualnie znajdujemy poprzez sygnał GPS.
+* Sprawdzenie 7-dniowej prognozy pogody.
+* Możliwość znalezienia dowolnego miasta i sprawdzenia jego 7-dniowej prognozy pogody.
+* Możliwość dodania miast do ulubionych, przez co szybko można sprawdzić w nich 7-dniową prognozę pogody.
